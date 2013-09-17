@@ -1,0 +1,8 @@
+[Etats]
+etat1
+etat2
+etat3
+
+[Transitions]
+transition1 etat1 etat2
+transition2 etat1 etat3

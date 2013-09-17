@@ -1,0 +1,16 @@
+[Etats]
+Idle final
+Paying
+Paid
+Back
+Serving
+
+[Transitions]
+?coin Idle Paying
+?coin Paying Paying
+?coin Paying Paid
+?back Paying Back
+?back Paid Back
+!money Back Idle
+?push Paid Serving
+!coffee Serving Idle
