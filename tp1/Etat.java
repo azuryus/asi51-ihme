@@ -22,12 +22,23 @@ public class Etat {
     }
 
     public void ajouterTransition(Transition transition) {
+	if(existTransition(transition.getLabel().substring(1))) {
+	    String label = transition.getLabel();
+	    int i = 1;
+	    while(existTransition(label.substring(1)+i))
+		i++;
+	    transition.setLabel(label+i);
+	}
 	transitions.add(transition);
+    }
+
+    public boolean existTransition(String label) {
+	return (findTransitionByLabel(label) != null);
     }
 
     public Transition findTransitionByLabel(String label) {
 	for(Transition tr : transitions) {
-	    if(tr.getLabel().equals(label))
+	    if(tr.getLabel().equals("?"+label))
 		return tr;
 	}
 
@@ -40,5 +51,9 @@ public class Etat {
 		return tr;
 
 	return null;
+    }
+
+    public boolean getFinal() {
+	return fin;
     }
 }

@@ -9,7 +9,15 @@ public class Transition {
 	this.etatSortant = etat;
     }
 
+    public void setLabel(String label) {
+	this.label = label;
+    }
+
     public String getLabel() {
 	return label;
+    }
+
+    public Etat getEtatSortant() {
+	return this.etatSortant;
     }
 }

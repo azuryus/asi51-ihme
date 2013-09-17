@@ -7,12 +7,14 @@ import java.io.FileInputStream;
 import java.io.BufferedReader;
 
 public class Automate {
-    private ArrayList<Etat> etats;
-    private Etat etatCourant;
+    protected ArrayList<Etat> etats;
+    protected Etat etatCourant;
+    protected boolean debug;
 
-    public Automate(String fichier) {
+    public Automate(String fichier, boolean debug) {
+	this.debug = debug;
 	etats = new ArrayList<Etat>();
-
+	
 	try{
 	    InputStream flux=new FileInputStream(fichier); 
 	    InputStreamReader lecture=new InputStreamReader(flux);
@@ -31,24 +33,24 @@ public class Automate {
 	    System.out.println(e.toString());
 	}
     }
-
-    private void initEtats(BufferedReader buff) {
-	System.out.println("Ajout des états");
+    
+    protected void initEtats(BufferedReader buff) {
+	if(debug) System.out.println("Ajout des états");
 	try{
 	    String ligne;
 	    while((ligne = buff.readLine())!=null && !ligne.trim().isEmpty()) {
 		String[] infos = ligne.split(" ");
 		etats.add(new Etat(infos[0], (infos.length > 1)));
-		System.out.println(" Etat "+ligne+" ajouté");
+		if(debug) System.out.println(" Etat "+ligne+" ajouté");
 	    }
 	}
 	catch(Exception e) {
 	    System.out.println(e.toString());
 	}
     }
-
-    private void initTransitions(BufferedReader buff) {
-	System.out.println("Ajout des transitions");
+    
+    protected void initTransitions(BufferedReader buff) {
+	if(debug) System.out.println("Ajout des transitions");
 	try{
 	    String ligne;
 	    while((ligne = buff.readLine())!=null && !ligne.trim().isEmpty()) {
@@ -56,15 +58,15 @@ public class Automate {
 		Etat etatEntrant = findByLabel(infos[1]);
 		Etat etatSortant = findByLabel(infos[2]);
 		etatEntrant.ajouterTransition(new Transition(infos[0], etatSortant));
-		System.out.println(" Transition "+ infos[0] +" ajouté");
+		if(debug) System.out.println(" Transition "+ infos[0] +" ajouté");
 	    }
 	}
 	catch(Exception e) {
 	    System.out.println(e.toString());
 	}
     }
-
-    private Etat findByLabel(String label) {
+    
+    protected Etat findByLabel(String label) {
 	for(Etat etat : etats) {
 	    if(etat.getLabel().equals(label))
 		return etat;
@@ -72,7 +74,7 @@ public class Automate {
 	
 	return null;
     }
-
+    
     public Etat getEtatCourant() {
 	return etatCourant;
     }
