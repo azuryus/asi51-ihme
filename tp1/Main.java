@@ -24,7 +24,7 @@ public class Main {
 	    fichier = args[1];
 	}
 
-	Automate auto = new MachineCafe(fichier, debug);
+	Automate auto = new Automate(fichier, debug);
 	if(!load) auto.run();
     }
 }

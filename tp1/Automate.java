@@ -82,6 +82,37 @@ public class Automate {
     public void run() {
 	System.out.println("Lancement");
 	System.out.println("---------");
+
+	do {
+	    Transition tr = etatCourant.findTransitionEnvoi();
+	    if(tr != null) {
+		etatCourant = tr.getEtatSortant();
+		System.out.println("Message: " + tr.getLabel().substring(1));
+		System.out.println("Etat: " + etatCourant.getLabel());
+	    }
+	    System.out.print("Action: ");
+	    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	    String choix = "";
+	    try {
+		choix = br.readLine();
+	    }
+	    catch(Exception e) {
+		System.err.println("IO error");
+		System.exit(0);
+	    }
+
+	    if(!choix.equals("")) {
+		tr = etatCourant.findTransitionByLabel(choix);
+		if(tr != null) {
+		    etatCourant = tr.getEtatSortant();
+		    System.out.println("Etat: " + etatCourant.getLabel());
+		}
+		else {
+		    System.out.println("Action non trouvée");
+		}
+	    }
+	}
+	while(!etatCourant.getFinal());
 	
 	System.out.println("---------");
 	System.out.println("Fin");
