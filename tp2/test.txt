@@ -1,0 +1,11 @@
+[Etats]
+etat1 final
+etat2
+
+[Transitions]
+?transi1 etat1 etat1 [] [x++]
+!transi2 etat1 etat2 [x>3] [x:=0]
+?transi3 etat2 etat1
+
+[Variables]
+x:=0
