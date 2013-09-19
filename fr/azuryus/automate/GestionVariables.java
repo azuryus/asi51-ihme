@@ -1,5 +1,7 @@
 package fr.azuryus.automate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,19 +62,38 @@ public class GestionVariables {
 	 * @param exp expression
 	 */
 	public void execExp(String exp) {
-		if(!exp.matches("\\p{Alpha}+(:=.*|\\+\\+|--)")) {
-			String var = getVarFromExp(exp);
-			exp = var+"="+exp;
+		if(!exp.equals("")) {
+			if(!exp.matches("\\p{Alpha}+(:=.*|\\+\\+|--)")) {
+				String var = getVarFromExp(exp);
+				exp = var+"="+exp;
+			}
+			else {
+				exp = exp.replace(":=", "=");
+			}
+			try {
+				engine.eval(exp);
+			} catch (ScriptException e) {
+				System.err.println("Expression mal formée");
+			}
 		}
-		else {
-			exp = exp.replace(":=", "=");
-		}
-		try {
-			System.out.println(exp);
-			engine.eval(exp);
-		} catch (ScriptException e) {
-			System.err.println("Expression mal formée");
-		}
+	}
+
+	/**
+	 * Execute un ensemble d'action, séparées par un caractère donné
+	 * @param exp liste d'actions
+	 * @param delimiter caractère séparant les actions
+	 */
+	public void execExp(String exp, String delimiter) {
+		execExp(new ArrayList<>(Arrays.asList(exp.split(delimiter))));
+	}
+
+	/**
+	 * Execute toutes les actions d'une liste
+	 * @param exps liste des actions
+	 */
+	public void execExp(ArrayList<String> exps) {
+		for(String exp : exps)
+			execExp(exp);
 	}
 
 	/**
@@ -81,7 +102,8 @@ public class GestionVariables {
 	 * @return le résultat du test
 	 */
 	public boolean evalCond(String cond) {
-		boolean valide = false;
+		boolean valide = true;
+		if(cond.equals("")) return valide;
 		cond = cond.replaceAll("([^<>])=", "$1==");
 		try {
 			valide = (Boolean)engine.eval(cond);
@@ -92,7 +114,24 @@ public class GestionVariables {
 		return valide;
 	}
 
-	private String getVarFromExp(String exp) {
+	public boolean evalCond(String conds, String delimiter) {
+		boolean valide = true;
+		return evalCond(new ArrayList<>(Arrays.asList(conds.split(delimiter))));
+	}
+
+	public boolean evalCond(ArrayList<String> conds) {
+		boolean valide = true;
+		for(String cond : conds)
+			valide &= evalCond(cond);
+		return valide;
+	}
+
+	/**
+	 * Trouve le nom de la variable de gauche dans une expression
+	 * @param exp expression à décomposer
+	 * @return nom de la variable
+	 */
+	public String getVarFromExp(String exp) {
 		Pattern p = Pattern.compile("(\\p{Alpha}*).*");
 		Matcher m = p.matcher(exp);
 		if(!m.matches()) System.err.println("Erreur de syntaxe dans une action");
@@ -132,6 +171,6 @@ public class GestionVariables {
 		gestion.execExp("valY++");
 		System.out.println("valY++: " + gestion.get("valY"));
 		gestion.execExp("aze+3");
-		System.out.println("TODO aze+3: " + gestion.get("aze"));
+		System.out.println("aze+3: " + gestion.get("aze"));
 	}
 }
