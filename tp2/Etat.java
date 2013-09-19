@@ -1,6 +1,7 @@
 package tp2;
 
 import java.util.ArrayList;
+import java.lang.reflect.Array;
 
 public class Etat {
     private String label;
@@ -45,12 +46,13 @@ public class Etat {
 	return null;
     }
 
-    public Transition findTransitionEnvoi() {
+    public ArrayList<Transition> findTransitionsEnvoi() {
+	ArrayList<Transition> trEnvoi = new ArrayList<>();
 	for(Transition tr : transitions)
 	    if(tr.getLabel().startsWith("!"))
-		return tr;
+		trEnvoi.add(tr);
 
-	return null;
+	return trEnvoi;
     }
 
     public boolean getFinal() {

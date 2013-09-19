@@ -19,9 +19,14 @@ public class Automate {
 
     public Automate(String fichier, boolean debug) {
 	this.debug = debug;
-	etats = new ArrayList<Etat>();
+	etats = new ArrayList<>();
 	variables = new HashMap<>();
-	
+	initAutomate(fichier);
+    }
+
+    private void initAutomate(String fichier) {
+	if(debug) System.out.println("Initialisation");
+	if(debug) System.out.println("--------------");
 	try{
 	    InputStream flux=new FileInputStream(fichier); 
 	    InputStreamReader lecture=new InputStreamReader(flux);
@@ -41,6 +46,7 @@ public class Automate {
 	catch (Exception e){
 	    System.out.println(e.toString());
 	}
+	if(debug) System.out.println("--------------");
     }
     
     protected void initEtats(BufferedReader buff) {
@@ -110,7 +116,6 @@ public class Automate {
 	    if(etat.getLabel().equals(label))
 		return etat;
 	}
-	
 	return null;
     }
     
@@ -123,40 +128,67 @@ public class Automate {
 	ScriptEngineManager mgr = new ScriptEngineManager();
 	ScriptEngine engine = mgr.getEngineByName("JavaScript");
 	for(String cond : conditions) {
-	    Pattern p = Pattern.compile("(\\p{Alpha}*)(.*)");
+	    Pattern p = Pattern.compile("(\\p{Alpha}*).*");
 	    Matcher m = p.matcher(cond);
-	    if(m.matches()) {
-	    	String var = m.group(1);
-		String op = m.group(2);
-		String operation = variables.get(var)+op;
-		String result = "false";
-		try{
-		    result = engine.eval(operation).toString();
-		}
-		catch(Exception e) {
-		    System.err.println(e.toString());
-		}
-		boolean b = Boolean.valueOf(result);
-		valide &= b;
+	    if(!m.matches()) System.err.println("Erreur de syntaxe dans une condition");
+	    String var = m.group(1);
+	    cond = cond.replaceAll("[^<>]=", "==");
+	    boolean result = false;
+	    try{
+		engine.put(var, variables.get(var));
+		result = (Boolean)engine.eval(cond);
 	    }
-	    else
-		valide &= false;
+	    catch(Exception e) {
+		System.err.println(e.toString());
+	    }
+	    if(debug) System.out.println(" cond: " + cond + " " + result);
+	    valide &= result;
 	}
 	return valide;
+    }
+
+    public void execActions(String[] actions) {
+	ScriptEngineManager mgr = new ScriptEngineManager();
+	ScriptEngine engine = mgr.getEngineByName("JavaScript");
+	for(String act : actions) {
+	    Pattern p = Pattern.compile("(\\p{Alpha}*).*");
+	    Matcher m = p.matcher(act);
+	    if(!m.matches()) System.err.println("Erreur de syntaxe dans une action");
+	    String var = m.group(1);
+	    act = act.replace(":=", "=");
+	    if(debug) System.out.println(" action: " + act);
+	    float result = variables.get(var);
+	    try{
+		engine.put(var, result);
+		engine.eval(act);
+		result = Float.parseFloat(engine.get(var).toString());
+		// result = (Double)engine.get(var);
+	    }
+	    catch(Exception e) {
+		System.err.println(e.toString());
+	    }
+	    if(debug) System.out.println(" result: " + result);
+	    variables.put(var, result);
+	}
     }
     
     public void run() {
 	System.out.println("Lancement");
 	System.out.println("---------");
+	
+	boolean sortie = false;
 
 	do {
-	    Transition tr = etatCourant.findTransitionEnvoi();
-	    if(tr != null) {
+	    sortie = etatCourant.getFinal();
+	    ArrayList<Transition> trEnvoi = etatCourant.findTransitionsEnvoi();
+	    for(Transition tr : trEnvoi) {
 		String[] conditions = tr.getConditions();
-		boolean valide = verifConditions(conditions);
+		boolean valide = verifConditions(tr.getConditions());
 		if(valide) {
-		    etatCourant = tr.getEtatSortant();
+		    sortie = false;
 		    System.out.println("Message: " + tr.getLabel().substring(1));
+		    execActions(tr.getActions());
+		    etatCourant = tr.getEtatSortant();
 		    System.out.println("Etat: " + etatCourant.getLabel());
 		}
 	    }
@@ -172,9 +204,11 @@ public class Automate {
 	    }
 
 	    if(!choix.equals("")) {
-		tr = etatCourant.findTransitionByLabel(choix);
-		if(tr != null) {
-		    etatCourant = tr.getEtatSortant();
+		Transition trRecu = etatCourant.findTransitionByLabel(choix);
+		if(trRecu != null) {
+		    sortie = false;
+		    execActions(trRecu.getActions());
+		    etatCourant = trRecu.getEtatSortant();
 		    System.out.println("Etat: " + etatCourant.getLabel());
 		}
 		else {
@@ -182,7 +216,7 @@ public class Automate {
 		}
 	    }
 	}
-	while(!etatCourant.getFinal());
+	while(!sortie);
 	
 	System.out.println("---------");
 	System.out.println("Fin");

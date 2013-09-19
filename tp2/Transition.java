@@ -3,8 +3,8 @@ package tp2;
 public class Transition {
     private String label;
     private Etat etatSortant;
-    private String[] conditions;
-    private String[] actions;
+    private String[] conditions = {};
+    private String[] actions = {};
 
     public Transition(String label, Etat etat) {
 	this.label = label;

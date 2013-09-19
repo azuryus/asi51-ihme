@@ -12,16 +12,19 @@ public class Main {
 	boolean debug = false;
 	boolean load = false;
 
-	if(args.length == 1)
+	if(args.length == 0) {
+	    System.err.println("Aucun fichier");
+	    System.exit(0);
+	}
+	if(args.length >= 1)
 	    fichier = args[0];
-	else if(args.length >= 2) {
-	    if(args[0].equals("--debug"))
+	if(args.length >= 2) {
+	    if(args[1].equals("--debug"))
 		debug = true;
-	    if(args[0].equals("--load")) {
+	    if(args[1].equals("--load")) {
 		load = true;
 		debug = true;
 	    }
-	    fichier = args[1];
 	}
 
 	Automate auto = new Automate(fichier, debug);
