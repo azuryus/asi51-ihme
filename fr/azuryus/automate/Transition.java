@@ -1,4 +1,4 @@
-package tp2;
+package fr.azuryus.automate;
 
 public class Transition {
     private String label;

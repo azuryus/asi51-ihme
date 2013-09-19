@@ -1,1 +1,7 @@
+# Fichiers compilés
 *.class
+
+# Fichiers Eclipse
+.classpath
+.project
+

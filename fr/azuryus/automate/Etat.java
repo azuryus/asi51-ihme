@@ -1,4 +1,4 @@
-package tp2;
+package fr.azuryus.automate;
 
 import java.util.ArrayList;
 import java.lang.reflect.Array;
