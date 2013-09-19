@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" additionalparam=" -encoding &quot;utf8&quot; -docencoding &quot;utf8&quot; -charset &quot;utf8&quot;" author="true" classpath="." destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7" sourcefiles="fr/azuryus/automate/GestionVariables.java" sourcepath="." splitindex="true" use="true" version="true"/>
+    </target>
+</project>

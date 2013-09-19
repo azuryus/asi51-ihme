@@ -5,7 +5,7 @@ etat2
 [Transitions]
 ?transi1 etat1 etat1 [] [x++]
 !transi2 etat1 etat2 [x>4] [x:=0]
-?transi1 etat2 etat2 [] [x=x+2]
+?transi1 etat2 etat2 [] [x+2]
 !transi3 etat2 etat1 [x>=1]
 
 [Variables]
