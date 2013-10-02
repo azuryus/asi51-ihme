@@ -1,20 +1,23 @@
 package fr.azuryus.automate;
 
 import java.util.ArrayList;
-import java.lang.reflect.Array;
+
+import fr.azuryus.automate.exception.TransitionNonTrouveException;
 
 public class Etat {
     private String label;
     private ArrayList<Transition> transitions;
     private boolean fin;
+    private GestionVariables variables;
 
-    public Etat(String label, boolean fin) {
-	this.label = label;
-	transitions = new ArrayList<Transition>();
-	this.fin = fin;
-    }
+    public Etat(String label, boolean fin, GestionVariables variables) {
+    	this.label = label;
+		transitions = new ArrayList<Transition>();
+		this.fin = fin;
+		this.variables = variables;
+	}
 
-    public String getLabel() {
+	public String getLabel() {
 	return label;
     }
 
@@ -23,27 +26,43 @@ public class Etat {
     }
 
     public void ajouterTransition(Transition transition) {
-	if(existTransition(transition.getLabel().substring(1))) {
-	    String label = transition.getLabel();
-	    int i = 1;
-	    while(existTransition(label.substring(1)+i))
-		i++;
-	    transition.setLabel(label+i);
-	}
-	transitions.add(transition);
+		if(existTransition(transition.getLabel().substring(1))) {
+		    String label = transition.getLabel();
+		    int i = 1;
+		    while(existTransition(label.substring(1)+i))
+			i++;
+		    transition.setLabel(label+i);
+		}
+		transitions.add(transition);
     }
 
     public boolean existTransition(String label) {
-	return (findTransitionByLabel(label) != null);
+    	boolean exist = true;
+		try {
+			findTransitionByLabel(label);
+		} catch (TransitionNonTrouveException e) {
+			exist = false;
+		}
+		return exist;
     }
 
-    public Transition findTransitionByLabel(String label) {
-	for(Transition tr : transitions) {
-	    if(tr.getLabel().equals("?"+label))
-		return tr;
-	}
+    public Transition findTransitionByLabel(String label) throws TransitionNonTrouveException {
+    	boolean trouve = false;
+		for(Transition tr : transitions) {
+		    if(tr.getLabel().equals(label)) {
+		    	trouve = true;
+		    	if(variables.evalCond(tr.getConditions(), ",")) {
+		    		return tr;
+		    	}
+		    }
+		}
 
-	return null;
+		if(!trouve) {
+			throw new TransitionNonTrouveException();
+		}
+		else {
+			return null;
+		}
     }
 
     public ArrayList<Transition> findTransitionsEnvoi() {

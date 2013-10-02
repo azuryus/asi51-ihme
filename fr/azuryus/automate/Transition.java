@@ -1,8 +1,5 @@
 package fr.azuryus.automate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class Transition {
 	private String label;
 	private Etat etatSortant;

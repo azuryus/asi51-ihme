@@ -2,6 +2,9 @@ package fr.azuryus.automate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +18,9 @@ import javax.script.ScriptException;
  * 
  */
 public class GestionVariables {
-	//	private ScriptEngineManager mgr;
 	private ScriptEngine engine;
+	private ScheduledExecutorService timer;
+	private ArrayList<String> varTimers;
 
 	/**
 	 * Constructeur
@@ -24,6 +28,14 @@ public class GestionVariables {
 	public GestionVariables() {
 		ScriptEngineManager mgr = new ScriptEngineManager();
 		engine = mgr.getEngineByName("JavaScript");
+		timer = Executors.newSingleThreadScheduledExecutor();
+		timer.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				incrementerTime();
+			}
+		}, 0, 500, TimeUnit.MILLISECONDS);
+		varTimers = new ArrayList<>();
 	}
 
 	/**
@@ -33,6 +45,11 @@ public class GestionVariables {
 	 */
 	public void addVariable(String nom, float valeur) {
 		engine.put(nom, valeur);
+	}
+	
+	public void addTimer(String nom, float valeur) {
+		varTimers.add(nom);
+		addVariable(nom, valeur);
 	}
 
 	/**
@@ -115,7 +132,6 @@ public class GestionVariables {
 	}
 
 	public boolean evalCond(String conds, String delimiter) {
-		boolean valide = true;
 		return evalCond(new ArrayList<>(Arrays.asList(conds.split(delimiter))));
 	}
 
@@ -137,9 +153,18 @@ public class GestionVariables {
 		if(!m.matches()) System.err.println("Erreur de syntaxe dans une action");
 		return m.group(1);
 	}
+	
+	private void incrementerTime() {
+		for(String var : varTimers) {
+			execExp(var+"+0.5");
+//			System.out.println(var + "=" + get(var));
+		}
+	}
+	
+	public void stopTimer() {
+		timer.shutdown();
+	}
 
-
-	@SuppressWarnings("javadoc")
 	public static void main(String[] args) {
 		System.out.println("Test GestionVariables");
 		System.out.println("---------------------");

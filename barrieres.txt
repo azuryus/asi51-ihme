@@ -1,0 +1,14 @@
+[Etats]
+basse final
+monter
+haute final
+baisser
+
+[Transitions]
+?lever basse monter [] [y:=0]
+?haute monter haute [y>1]
+?baisser haute baisser [] [y:=0]
+?basse baisser basse [y<1]
+
+[Variables]
+timer y:=0

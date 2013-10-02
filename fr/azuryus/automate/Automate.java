@@ -7,13 +7,17 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import fr.azuryus.automate.event.EtatEvent;
+import fr.azuryus.automate.event.EtatListener;
+import fr.azuryus.automate.exception.TransitionNonTrouveException;
+
 /**
  * Un automate reçoit des messages, execute des actions
  * et réponds selon sa configuration.
  * @author sguingoin
  *
  */
-public class Automate {
+public class Automate implements EtatListener {
 	protected ArrayList<Etat> etats;
 	protected Etat etatCourant;
 	protected boolean debug;
@@ -26,8 +30,13 @@ public class Automate {
 	 * @param fichier fichier de description de l'automate
 	 */
 	public Automate(String fichier) {
+		this(fichier, false);
+	}
+	
+	public Automate(String fichier, boolean debug) {
 		etats = new ArrayList<>();
 		variables = new GestionVariables();
+		this.debug = debug;
 		initAutomate(fichier);
 	}
 	
@@ -74,7 +83,7 @@ public class Automate {
 				if(infos.length > 1) {
 					sortant = infos[1].equals("final");
 				}
-				etats.add(new Etat(infos[0], sortant));
+				etats.add(new Etat(infos[0], sortant, variables));
 				if(debug) System.out.println(" Etat "+ligne+" ajouté");
 			}
 		}
@@ -117,7 +126,13 @@ public class Automate {
 			String ligne;
 			while((ligne = buff.readLine())!=null && !ligne.trim().isEmpty()) {
 				String infos[] = ligne.split(":=");
-				variables.addVariable(infos[0], Float.valueOf(infos[1]));
+				if(infos[0].contains("timer")) {
+					infos[0] = infos[0].replace("timer ", "");
+					variables.addTimer(infos[0], Float.parseFloat(infos[1]));
+				}
+				else {
+					variables.addVariable(infos[0], Float.valueOf(infos[1]));
+				}
 				if(debug) System.out.println(" Variable " + infos[0] + " ajoutée");
 			}
 		}
@@ -161,6 +176,8 @@ public class Automate {
 		}
 		while(!sortie);
 
+		variables.stopTimer();
+		
 		System.out.println("---------");
 		System.out.println("Fin");
 	}
@@ -173,13 +190,25 @@ public class Automate {
 				output.println("!" + tr.getLabel().substring(1));
 				variables.execExp(tr.getActions(), ",");
 				etatCourant = tr.getEtatSortant();
-//				System.out.println("Etat: " + etatCourant.getLabel());
+				if(debug) System.out.println("Etat: " + etatCourant.getLabel());
 				return false;
 			}
 		}
 		boolean sortie = etatCourant.getFinal();
-//		System.out.print("Action: ");
-		System.out.print("?");
+		
+		String choix = demanderTransition();
+
+		if(!choix.equals("")) {
+			changerEtat(choix);
+			return false;
+		}
+		return sortie;
+	}
+
+	private String demanderTransition() {
+		if(debug) System.out.print("Action: ");
+		
+//		System.out.print("?");
 		BufferedReader br = new BufferedReader(new InputStreamReader(input));
 		String choix = "";
 		try {
@@ -189,21 +218,30 @@ public class Automate {
 			System.err.println("IO error");
 			System.exit(0);
 		}
+		
+		return choix;
+	}
 
-		if(!choix.equals("")) {
-			sortie = false;
-			Transition trRecu = etatCourant.findTransitionByLabel(choix);
+	private void changerEtat(String transition) {
+		try {
+			Transition trRecu = etatCourant.findTransitionByLabel(transition);
 			if(trRecu != null) {
 				variables.execExp(trRecu.getActions(), ",");
 				etatCourant = trRecu.getEtatSortant();
-//				System.out.println("Etat: " + etatCourant.getLabel());
+				if(debug) System.out.println("Etat: " + etatCourant.getLabel());
 			}
 			else {
-				System.out.println("Action non trouvée");
+				System.err.println("Transition impossible");
 			}
 		}
-		return sortie;
+		catch(TransitionNonTrouveException e) {
+			System.err.println(e.getMessage());
+		}
 	}
 
+	@Override
+	public void nouvelEtat(EtatEvent e) {
+		changerEtat(e.getTransition().toString());
+	}
 
 }
