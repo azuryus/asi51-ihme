@@ -1,0 +1,17 @@
+[Etats]
+RS
+S final
+RF
+F
+
+[Transitions]
+trRS RS RS
+trS RS S
+trRF RS RF
+trS S S
+trRF S RF
+trRF RF RF
+trRS RF RS
+trF RF F
+trRF F RF
+trRS F RS

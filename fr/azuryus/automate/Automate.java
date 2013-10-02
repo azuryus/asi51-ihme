@@ -222,7 +222,7 @@ public class Automate implements EtatListener {
 		return choix;
 	}
 
-	private void changerEtat(String transition) {
+	public void changerEtat(String transition) {
 		try {
 			Transition trRecu = etatCourant.findTransitionByLabel(transition);
 			if(trRecu != null) {
@@ -243,5 +243,4 @@ public class Automate implements EtatListener {
 	public void nouvelEtat(EtatEvent e) {
 		changerEtat(e.getTransition().toString());
 	}
-
 }
