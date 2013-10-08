@@ -8,7 +8,7 @@ public abstract class EcoAgent {
 	private boolean gene;
 	
 	public EcoAgent() {
-		auto = new Automate("eco-agent.txt", true);
+		auto = new Automate("eco-agent.txt", false);
 	}
 
 	public boolean isAgresse() {
@@ -29,7 +29,7 @@ public abstract class EcoAgent {
 	
 	public abstract boolean satisfait();
 	
-	public abstract void faireFuite();
+	public abstract void faireFuite(EcoAgent agent);
 	
 	public abstract void faireSatisfaction();
 	

@@ -77,4 +77,8 @@ public class Etat {
     public boolean getFinal() {
 	return fin;
     }
+    
+    public String toString() {
+    	return this.label;
+    }
 }
