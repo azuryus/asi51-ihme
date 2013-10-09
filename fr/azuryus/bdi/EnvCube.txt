@@ -1,0 +1,15 @@
+pickup(x)
+onTable(x) clear(x) handEmpty
+holding(x)
+
+putDown(x)
+holding(x)
+onTable(x) clear(x) handEmpty
+
+stack(x,y)
+holding(x) clear(y)
+handEmtpy on(x,y) clear(x)
+
+unStack(x,y)
+handEmpty on(x,y) clear(x)
+holding(x) clear(y)
