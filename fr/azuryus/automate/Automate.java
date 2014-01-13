@@ -26,6 +26,16 @@ public class Automate {
 	 * @param fichier fichier de description de l'automate
 	 */
 	public Automate(String fichier) {
+		this(fichier, false);
+	}
+	
+	/**
+	 * Constructeur
+	 * @param fichier fichier de description de l'automate
+	 * @param debug mode debug des/activé
+	 */
+	public Automate(String fichier, boolean debug) {
+		this.debug = debug;
 		etats = new ArrayList<>();
 		variables = new GestionVariables();
 		initAutomate(fichier);

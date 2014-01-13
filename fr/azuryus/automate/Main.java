@@ -1,11 +1,5 @@
 package fr.azuryus.automate;
 
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Options;
-
-// import java.util.ArrayList;
-
 @SuppressWarnings("javadoc")
 public class Main {
     public static void main(String[] args) {
@@ -17,14 +11,6 @@ public class Main {
 	boolean debug = false;
 	boolean load = false;
 
-	CommandLineParser parser = new GnuParser();
-	
-	Options options = new Options();
-	
-	options.addOption("d", "debug", false, "Activer le mode debug");
-	options.addOption("l", "load", false, "Charger le fichier de configuration de l'automate puis quitter");
-	
-	
 	if(args.length == 0) {
 	    System.err.println("Aucun fichier");
 	    System.exit(0);
@@ -40,8 +26,7 @@ public class Main {
 	    }
 	}
 
-	Automate auto = new Automate(fichier);
-	auto.setDebug(debug);
+	Automate auto = new Automate(fichier, debug);
 	if(!load) auto.run();
     }
 }

@@ -115,7 +115,6 @@ public class GestionVariables {
 	}
 
 	public boolean evalCond(String conds, String delimiter) {
-		boolean valide = true;
 		return evalCond(new ArrayList<>(Arrays.asList(conds.split(delimiter))));
 	}
 

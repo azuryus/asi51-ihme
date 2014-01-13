@@ -4,6 +4,7 @@
 # Fichiers Eclipse
 .classpath
 .project
+.settings/
 
 # Documentation
 doc/

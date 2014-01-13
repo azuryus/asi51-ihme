@@ -1,7 +1,6 @@
 package fr.azuryus.automate;
 
 import java.util.ArrayList;
-import java.lang.reflect.Array;
 
 public class Etat {
     private String label;
